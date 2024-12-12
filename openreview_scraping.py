@@ -8,6 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 import requests
+import pandas as pd
 
 
 def fetch_article_links(url):
@@ -43,24 +44,55 @@ def extract_article_data(web_address):
     fields = article.find_all("strong", class_="note-content-field")
 
     # fetch keywords, tldr and abstract
+    keywords_value = None
+    tldr_value = None
+    abstract_value = None
+    
     for field in fields:
         if "Keywords" in field.get_text(strip=True):
             sibling = field.find_next_sibling("span", class_="note-content-value")
             if sibling:
                 keywords_value = sibling.get_text(strip=True)
                 keywords_value = keywords_value.replace(',', ';')
+            else:
+                keywords_value = None
                 
         elif "TL;DR" in field.get_text(strip=True):
             sibling = field.find_next_sibling("span", class_="note-content-value")
             if sibling:
                 tldr_value = sibling.get_text(strip=True)
+            else:
+                tldr_value = None
                 
         elif "Abstract" in field.get_text(strip=True):
             sibling = field.find_next_sibling("span", class_="note-content-value")
             if sibling:
                 abstract_value = sibling.get_text(strip=True)
+            else:
+                abstract_value = None
 
     return title, keywords_value, tldr_value, abstract_value
 
+url = 'https://horace.io/OpenReviewExplorer/'
+article_urls = fetch_article_links(url=url)
+
+urls = []
+titles = []
+keywords = []
+tldrs = []
+abstracts = []
 
 
+
+for address in article_urls:
+    title, keyword, tldr, abstract = extract_article_data(web_address=address)
+    urls.append(address)
+    titles.append(title)
+    keywords.append(keyword)
+    tldrs.append(tldr)
+    abstracts.append(abstract)
+    
+data_dict = {'urls':urls, 'titles':titles, 'keywords':keywords, 'tldrs':tldrs, 'abstracts':abstracts}
+
+df = pd.DataFrame(data_dict)
+df.to_csv('df.csv', index=False)
