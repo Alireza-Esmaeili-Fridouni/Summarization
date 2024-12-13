@@ -1,38 +1,17 @@
-
-# https://horace.io/OpenReviewExplorer/?conf=iclr2020&limit=1000000000
-# https://horace.io/OpenReviewExplorer/?conf=iclr2019&limit=1000000000
-# https://horace.io/OpenReviewExplorer/?conf=iclr2018&limit=1000000000
-# https://horace.io/OpenReviewExplorer/?conf=iclr2017&limit=1000000000
-
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 import time
 
 
-def fetch_article_links(url):
-    chrome_driver_path = "./chromedriver.exe"
-    service = Service(executable_path=chrome_driver_path)
-    driver = webdriver.Chrome(service=service)
-
-    driver.get(url=url)
-
-    # //*[@class="list"]//tr
-    # articles = driver.find_elements(by='xpath', value='//*[@class="list"]//tr')
-    # //a[contains(@href, "openreview.net")]
-    
-    tags = driver.find_elements(by='xpath', value='//a[contains(@href, "openreview.net")]')
-
-    articles_adresses = [tag.get_attribute('href') for tag in tags]
-    
-    return articles_adresses
-
-
 
 def extract_article_data(web_address): 
-    source = requests.get(web_address).text
+    try:
+        source = requests.get(web_address).text
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching URL {web_address}: {e}")
+        return None, None, None, None
 
     soup = BeautifulSoup(source, 'html.parser')
 
@@ -88,28 +67,69 @@ def extract_article_data(web_address):
     return title, keywords_value, tldr_value, abstract_value
 
 
+# def batch_addresses(url_list, batch_size, delay_minute):
+#     for index in range(0, len(url_list), batch_size):
+#         segment = url_list[index:index+batch_size]
+#         yield batch
+#         time.sleep(delay_minute * 60)
+        
+urls_df = pd.read_csv('urls_df.csv')
 
-url = 'https://horace.io/OpenReviewExplorer/'
-article_urls = fetch_article_links(url)
+chunk_urls = urls_df['urls'][0:200]
+chunk_urls = urls_df['urls'][200:400]
+chunk_urls = urls_df['urls'][400:600]
+chunk_urls = urls_df['urls'][600:800]
+chunk_urls = urls_df['urls'][800:1000]
+chunk_urls = urls_df['urls'][1000:1200]
+chunk_urls = urls_df['urls'][1200:1400]
+chunk_urls = urls_df['urls'][1400:1600]
+chunk_urls = urls_df['urls'][1600:1800]
+chunk_urls = urls_df['urls'][1800:2000]
+
 
 urls = []
 titles = []
 keywords = []
 tldrs = []
 abstracts = []
+counter = 1
+batch_counter = 1
 
-for address, counter in zip(article_urls, range(1, len(article_urls)+1)):
-    
-    title, keyword, tldr, abstract = extract_article_data(web_address=address)
-    urls.append(address)
-    titles.append(title)
-    keywords.append(keyword)
-    tldrs.append(tldr)
-    abstracts.append(abstract)
-    if counter % 30 == 0:
-        time.sleep(60)
+# for batch in batch_addresses(urls_df, batch_size=200, delay_minute=4):
+#     print('batch counter: ', batch_counter)
+#     for address in batch:
+        
+#         title, keyword, tldr, abstract = extract_article_data(web_address=address)
+#         urls.append(address)
+#         titles.append(title)
+#         keywords.append(keyword)
+#         tldrs.append(tldr)
+#         abstracts.append(abstract)
+#         if counter % 30 == 0:
+#             time.sleep(60)
+#         counter += 1
+#     batch_counter += 1
+
+for address in chunk_urls:
+    try:
+        title, keyword, tldr, abstract = extract_article_data(web_address=address)
+        if title is None: 
+            continue
+        urls.append(address)
+        titles.append(title)
+        keywords.append(keyword)
+        tldrs.append(tldr)
+        abstracts.append(abstract)
+        
+        if counter % 15 == 0:
+            print('number of extract data: ', counter)
+            time.sleep(60)
+        counter += 1
+    except Exception as e:
+        print(f"An error occurred with URL {address}: {e}")
+        continue
     
 data_dict = {'urls':urls, 'titles':titles, 'keywords':keywords, 'tldrs':tldrs, 'abstracts':abstracts}
 
-df = pd.DataFrame(data_dict)
-df.to_csv('df.csv', index=False)
+df_1800_1999 = pd.DataFrame(data_dict)
+df_1800_1999.to_csv('df_1800_1999.csv', index=False)
