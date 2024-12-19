@@ -73,28 +73,14 @@ def extract_article_data(web_address):
 #         yield batch
 #         time.sleep(delay_minute * 60)
         
-urls_df = pd.read_csv('urls_df.csv')
-
-chunk_urls = urls_df['urls'][0:200]
-chunk_urls = urls_df['urls'][200:400]
-chunk_urls = urls_df['urls'][400:600]
-chunk_urls = urls_df['urls'][600:800]
-chunk_urls = urls_df['urls'][800:1000]
-chunk_urls = urls_df['urls'][1000:1200]
-chunk_urls = urls_df['urls'][1200:1400]
-chunk_urls = urls_df['urls'][1400:1600]
-chunk_urls = urls_df['urls'][1600:1800]
-chunk_urls = urls_df['urls'][1800:2000]
-
-
-urls = []
-titles = []
-keywords = []
-tldrs = []
-abstracts = []
-counter = 1
-batch_counter = 1
-
+# urls = []
+# titles = []
+# keywords = []
+# tldrs = []
+# abstracts = []
+# counter = 1
+# batch_counter = 1
+        
 # for batch in batch_addresses(urls_df, batch_size=200, delay_minute=4):
 #     print('batch counter: ', batch_counter)
 #     for address in batch:
@@ -109,6 +95,52 @@ batch_counter = 1
 #             time.sleep(60)
 #         counter += 1
 #     batch_counter += 1
+
+
+
+urls_df = pd.read_csv('urls_df.csv')
+
+# creating static batch from iclr2017 to iclr2020
+
+# chunk_urls = urls_df['urls'][0:200]
+# chunk_urls = urls_df['urls'][200:400]
+# chunk_urls = urls_df['urls'][400:600]
+# chunk_urls = urls_df['urls'][600:800]
+# chunk_urls = urls_df['urls'][800:1000]
+# chunk_urls = urls_df['urls'][1000:1200]
+# chunk_urls = urls_df['urls'][1200:1400]
+# chunk_urls = urls_df['urls'][1400:1600]
+# chunk_urls = urls_df['urls'][1600:1800]
+# chunk_urls = urls_df['urls'][1800:2000]
+# chunk_urls = urls_df['urls'][2000:2200]
+# chunk_urls = urls_df['urls'][2200:2400]
+# chunk_urls = urls_df['urls'][2400:2600]
+# chunk_urls = urls_df['urls'][2600:2800]
+# chunk_urls = urls_df['urls'][2800:3000]
+# chunk_urls = urls_df['urls'][3000:3200]
+# chunk_urls = urls_df['urls'][3200:3400]
+# chunk_urls = urls_df['urls'][3400:3600]
+# chunk_urls = urls_df['urls'][3600:3800]
+# chunk_urls = urls_df['urls'][3800:4000]
+# chunk_urls = urls_df['urls'][4000:4200]
+# chunk_urls = urls_df['urls'][4200:4400]
+# chunk_urls = urls_df['urls'][4400:4600]
+# chunk_urls = urls_df['urls'][4600:4800]
+# chunk_urls = urls_df['urls'][4800:5000]
+# chunk_urls = urls_df['urls'][5000:5200]
+# chunk_urls = urls_df['urls'][5200:5400]
+chunk_urls = urls_df['urls'][5400:]
+
+
+
+urls = []
+titles = []
+keywords = []
+tldrs = []
+abstracts = []
+counter = 1
+
+
 
 for address in chunk_urls:
     try:
@@ -131,5 +163,5 @@ for address in chunk_urls:
     
 data_dict = {'urls':urls, 'titles':titles, 'keywords':keywords, 'tldrs':tldrs, 'abstracts':abstracts}
 
-df_1800_1999 = pd.DataFrame(data_dict)
-df_1800_1999.to_csv('df_1800_1999.csv', index=False)
+df_5400_5658 = pd.DataFrame(data_dict)
+df_5400_5658.to_csv('df_5400_5658.csv', index=False)
