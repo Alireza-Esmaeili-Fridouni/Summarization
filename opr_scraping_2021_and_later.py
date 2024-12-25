@@ -42,26 +42,39 @@ def extract_article_data(web_address):
     
     # Fetch keywords, tldr, abstract and one sentence summary
     for field in fields:
-        if "Keywords" in field.get_text(strip=True):
-            sibling = field.find_next_sibling("span", class_="note-content-value")
-            if sibling:
-                keywords_value = sibling.get_text(strip=True)
-                keywords_value = keywords_value.replace(',', ';')
+        sibling = field.find_next_sibling("span", class_="note-content-value")
+        if sibling:
+            # Use the extract_combined_text function to get combined text
+            combined_text = extract_combined_text(sibling)
+            if "Keywords" in field.get_text(strip=True):
+                keywords_value = combined_text.replace(',', ';')
+            elif "TL;DR" in field.get_text(strip=True):
+                tldr_value = combined_text
+            elif "Abstract" in field.get_text(strip=True):
+                abstract_value = combined_text
+            elif "One-sentence Summary" in field.get_text(strip=True):
+                one_sent_summ_value = combined_text
+    # for field in fields:
+    #     if "Keywords" in field.get_text(strip=True):
+    #         sibling = field.find_next_sibling("span", class_="note-content-value")
+    #         if sibling:
+    #             keywords_value = sibling.get_text(strip=True)
+    #             keywords_value = keywords_value.replace(',', ';')
                 
-        elif "TL;DR" in field.get_text(strip=True):
-            sibling = field.find_next_sibling("span", class_="note-content-value")
-            if sibling:
-                tldr_value = sibling.get_text(strip=True)
+    #     elif "TL;DR" in field.get_text(strip=True):
+    #         sibling = field.find_next_sibling("span", class_="note-content-value")
+    #         if sibling:
+    #             tldr_value = sibling.get_text(strip=True)
                 
-        elif "Abstract" in field.get_text(strip=True):
-            sibling = field.find_next_sibling("span", class_="note-content-value")
-            if sibling:
-                abstract_value = sibling.get_text(strip=True)
+    #     elif "Abstract" in field.get_text(strip=True):
+    #         sibling = field.find_next_sibling("span", class_="note-content-value")
+    #         if sibling:
+    #             abstract_value = sibling.get_text(strip=True)
         
-        elif "One-sentence Summary" in field.get_text(strip=True):
-            sibling = field.find_next_sibling("span", class_="note-content-value")
-            if sibling:
-                one_sent_summ_value = sibling.get_text(strip=True)
+    #     elif "One-sentence Summary" in field.get_text(strip=True):
+    #         sibling = field.find_next_sibling("span", class_="note-content-value")
+    #         if sibling:
+    #             one_sent_summ_value = sibling.get_text(strip=True)
     
     if not keywords_value:
         keywords_value = 'None'
@@ -76,11 +89,48 @@ def extract_article_data(web_address):
 
 
 
+def extract_combined_text(element):
+    """
+    This function extracts text from an HTML element, combining normal text and MathJax.
+    """
+    combined_text = []
+    
+    for content in element.contents:
+        if isinstance(content, str):
+            # If the content is a string, add it directly
+            combined_text.append(content)
+        elif content.name == 'mjx-container':
+            # If the content is a MathJax element, extract its text
+            combined_text.append(content.get_text(strip=True))
+        else:
+            # If it's another element, process it recursively
+            combined_text.append(extract_combined_text(content))
+    
+    return ''.join(combined_text)
 
 
-urls_df = pd.read_csv('urls/urls_iclr_2021_df.csv')
 
-chunk_urls = urls_df['urls'][0:10]
+
+
+urls_df = pd.read_csv('urls/iclr_2022_urls_df.csv')
+
+# creating static batch from urls
+
+# chunk_urls = urls_df['urls'][0:200]
+# chunk_urls = urls_df['urls'][200:400]
+# chunk_urls = urls_df['urls'][400:600]
+# chunk_urls = urls_df['urls'][600:800]
+# chunk_urls = urls_df['urls'][800:1000]
+# chunk_urls = urls_df['urls'][1000:1200]
+# chunk_urls = urls_df['urls'][1200:1400]
+chunk_urls = urls_df['urls'][1400:1600]
+# chunk_urls = urls_df['urls'][1600:1800]
+# chunk_urls = urls_df['urls'][1800:2000]
+# chunk_urls = urls_df['urls'][2000:2200]
+# chunk_urls = urls_df['urls'][2200:2400]
+# chunk_urls = urls_df['urls'][2400:2600]
+# chunk_urls = urls_df['urls'][2600:2800]
+# chunk_urls = urls_df['urls'][2800:]
 
 urls = []
 titles = []
@@ -104,7 +154,7 @@ for address in chunk_urls:
         abstracts.append(abstract)
         one_sentence_summ.append(one_s_summ)
         
-        if counter % 15 == 0:
+        if counter % 30 == 0:
             print('number of extract data: ', counter)
             time.sleep(60)
         counter += 1
@@ -115,5 +165,5 @@ for address in chunk_urls:
 data_dict = {'urls':urls, 'titles':titles, 'keywords':keywords,
              'tldrs':tldrs, 'abstracts':abstracts, 'one_sentence_summ':one_sentence_summ}
 
-test = pd.DataFrame(data_dict)
-test.to_csv('test/test.csv', index=False)
+df_1400_1599 = pd.DataFrame(data_dict)
+df_1400_1599.to_csv('iclr_2022/df_1400_1599.csv', index=False, encoding='utf-8')
