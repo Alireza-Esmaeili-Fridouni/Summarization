@@ -53,10 +53,10 @@ driver = webdriver.Chrome(service=service)
 # url = 'https://openreview.net/group?id=ICLR.cc/2023/Conference'
 
 # url of iclr 2024
-# url = 'https://openreview.net/group?id=ICLR.cc/2024/Conference'
+url = 'https://openreview.net/group?id=ICLR.cc/2024/Conference'
 
 # url of iclr 2025
-url = 'https://openreview.net/group?id=ICLR.cc/2025/Conference'
+# url = 'https://openreview.net/group?id=ICLR.cc/2025/Conference'
 
 driver.get(url=url)
 
@@ -73,10 +73,10 @@ tab_names = [tag.get_attribute('id') for tag in tags if tag.get_attribute('id') 
 # ref_address = 'https://openreview.net/group?id=ICLR.cc/2023/Conference#'
 
 # reference addresse of iclr 2024 
-# ref_address = 'https://openreview.net/group?id=ICLR.cc/2024/Conference#tab-'
+ref_address = 'https://openreview.net/group?id=ICLR.cc/2024/Conference#tab-'
 
 # reference addresse of iclr 2025 
-ref_address = 'https://openreview.net/group?id=ICLR.cc/2025/Conference#tab-'
+# ref_address = 'https://openreview.net/group?id=ICLR.cc/2025/Conference#tab-'
 
 article_urls = [fetch_links(url=f"{ref_address}{tab_name}", id=tab_name) for tab_name in tab_names]
 article_urls = list(chain(*article_urls))
@@ -92,10 +92,10 @@ urls_dict = {'urls':article_urls}
 # iclr_2023_urls_df.to_csv('urls/iclr_2023_urls_df.csv', index=False)
 
 # creating dataframe from iclr 2024
-# iclr_2024_urls_df = pd.DataFrame(urls_dict)
-# iclr_2024_urls_df.to_csv('urls/iclr_2024_urls_df.csv', index=False)
+iclr_2024_urls_df = pd.DataFrame(urls_dict)
+iclr_2024_urls_df.to_csv('urls/iclr_2024_urls_df.csv', index=False)
 
 # creating dataframe from iclr 2025
-iclr_2025_urls_df = pd.DataFrame(urls_dict)
-iclr_2025_urls_df.to_csv('urls/iclr_2025_urls_df.csv', index=False)
+# iclr_2025_urls_df = pd.DataFrame(urls_dict)
+# iclr_2025_urls_df.to_csv('urls/iclr_2025_urls_df.csv', index=False)
 
