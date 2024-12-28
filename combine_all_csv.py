@@ -1,17 +1,30 @@
 import pandas as pd
 import glob
+import re
+import os
 
-names_datasets = glob.glob('df_*.csv')
 
-df_iclr_2017_2020 = pd.DataFrame()
+def combine_csv(name_folder: str):
+    # names_datasets = list(map(os.path.basename, glob.glob(f'{name_folder}/df_*.csv')))
 
-dfs = []
+    names_datasets = glob.glob(f'{name_folder}/df_*.csv')
+    names_datasets = sorted(names_datasets,
+                            key=lambda x: [int(num) for num in re.findall(r'\d+', os.path.basename(x))]
+                            )
 
-for file in names_datasets:
-    df_temp = pd.read_csv(file)
-    dfs.append(df_temp)
+    df = pd.DataFrame()
+
+    df_list = []
+
+    for file in names_datasets:
+        df_temp = pd.read_csv(file)
+        df_list.append(df_temp)
+        
+    df = pd.concat(df_list, ignore_index=True)
     
-df_iclr_2017_2020 = pd.concat(dfs, ignore_index=True)
+    return df
 
-df_iclr_2017_2020.to_csv('df_iclr_2017_2020.csv', index=False)
+
+iclr_20212 = combine_csv('iclr_from_2017_to_2020')
+iclr_20212.to_csv('test_2021.csv', index=False)
 
