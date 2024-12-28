@@ -5,13 +5,13 @@ import time
 
 
 
-def extract_article_data(web_address): 
+def extract_article_data(web_address, years:int): 
     try:
         source = requests.get(web_address).text
         
     except requests.exceptions.RequestException as e:
         print(f"Error fetching URL {web_address}: {e}")
-        return None, None, None, None
+        return None, None, None, None, None
 
     soup = BeautifulSoup(source, 'html.parser')
 
@@ -22,8 +22,10 @@ def extract_article_data(web_address):
     if not article:
         raise Exception(f"Error: 'forum-container' not found for {web_address}")
 
-    
-    title_element = article.find('div', class_='title_pdf_row')
+    if years != 2024:
+        title_element = article.find('div', class_='title_pdf_row')
+    else:
+        title_element = article.find('div', class_='forum-title')
     
     # Check for the existence of the 'title_pdf_row' element
     if not title_element or not title_element.h2:
@@ -54,27 +56,6 @@ def extract_article_data(web_address):
                 abstract_value = combined_text
             elif "One-sentence Summary" in field.get_text(strip=True):
                 one_sent_summ_value = combined_text
-    # for field in fields:
-    #     if "Keywords" in field.get_text(strip=True):
-    #         sibling = field.find_next_sibling("span", class_="note-content-value")
-    #         if sibling:
-    #             keywords_value = sibling.get_text(strip=True)
-    #             keywords_value = keywords_value.replace(',', ';')
-                
-    #     elif "TL;DR" in field.get_text(strip=True):
-    #         sibling = field.find_next_sibling("span", class_="note-content-value")
-    #         if sibling:
-    #             tldr_value = sibling.get_text(strip=True)
-                
-    #     elif "Abstract" in field.get_text(strip=True):
-    #         sibling = field.find_next_sibling("span", class_="note-content-value")
-    #         if sibling:
-    #             abstract_value = sibling.get_text(strip=True)
-        
-    #     elif "One-sentence Summary" in field.get_text(strip=True):
-    #         sibling = field.find_next_sibling("span", class_="note-content-value")
-    #         if sibling:
-    #             one_sent_summ_value = sibling.get_text(strip=True)
     
     if not keywords_value:
         keywords_value = 'None'
@@ -89,10 +70,9 @@ def extract_article_data(web_address):
 
 
 
+
+# This function extracts text from an HTML element, combining normal text and MathJax.
 def extract_combined_text(element):
-    """
-    This function extracts text from an HTML element, combining normal text and MathJax.
-    """
     combined_text = []
     
     for content in element.contents:
@@ -109,61 +89,57 @@ def extract_combined_text(element):
     return ''.join(combined_text)
 
 
+# Creator batch from urls
+def batch_creator(urls_list, batch_size, delay_minute):
+    for index in range(0, len(urls_list), batch_size):
+        batch = urls_list[index:index+batch_size]
+        yield batch
+        time.sleep(delay_minute*60)
 
 
 
-urls_df = pd.read_csv('urls/iclr_2022_urls_df.csv')
+urls_df = pd.read_csv('urls/iclr_2024_urls_df.csv')
+urls_list = urls_df['urls'].tolist()
 
-# creating static batch from urls
-
-# chunk_urls = urls_df['urls'][0:200]
-# chunk_urls = urls_df['urls'][200:400]
-# chunk_urls = urls_df['urls'][400:600]
-# chunk_urls = urls_df['urls'][600:800]
-# chunk_urls = urls_df['urls'][800:1000]
-# chunk_urls = urls_df['urls'][1000:1200]
-# chunk_urls = urls_df['urls'][1200:1400]
-chunk_urls = urls_df['urls'][1400:1600]
-# chunk_urls = urls_df['urls'][1600:1800]
-# chunk_urls = urls_df['urls'][1800:2000]
-# chunk_urls = urls_df['urls'][2000:2200]
-# chunk_urls = urls_df['urls'][2200:2400]
-# chunk_urls = urls_df['urls'][2400:2600]
-# chunk_urls = urls_df['urls'][2600:2800]
-# chunk_urls = urls_df['urls'][2800:]
-
-urls = []
-titles = []
-keywords = []
-tldrs = []
-abstracts = []
-one_sentence_summ = []
 counter = 1
+batch_counter = 0
 
 
-
-for address in chunk_urls:
-    try:
-        title, keyword, tldr, abstract, one_s_summ = extract_article_data(web_address=address)
-        if title is None: 
-            continue
-        urls.append(address)
-        titles.append(title)
-        keywords.append(keyword)
-        tldrs.append(tldr)
-        abstracts.append(abstract)
-        one_sentence_summ.append(one_s_summ)
-        
-        if counter % 30 == 0:
-            print('number of extract data: ', counter)
-            time.sleep(60)
-        counter += 1
-    except Exception as e:
-        print(f"An error occurred with URL {address}: {e}")
-        continue
+for batch in batch_creator(urls_list, 200, 2):
+    urls = []
+    titles = []
+    keywords = []
+    tldrs = []
+    abstracts = []
+    one_sentence_summ = []
     
-data_dict = {'urls':urls, 'titles':titles, 'keywords':keywords,
-             'tldrs':tldrs, 'abstracts':abstracts, 'one_sentence_summ':one_sentence_summ}
-
-df_1400_1599 = pd.DataFrame(data_dict)
-df_1400_1599.to_csv('iclr_2022/df_1400_1599.csv', index=False, encoding='utf-8')
+    for address in batch:
+        try:
+            title, keyword, tldr, abstract, one_s_summ = extract_article_data(web_address=address, years=2024)
+            if title is None: 
+                continue
+            urls.append(address)
+            titles.append(title)
+            keywords.append(keyword)
+            tldrs.append(tldr)
+            abstracts.append(abstract)
+            one_sentence_summ.append(one_s_summ)
+            
+            if counter % 30 == 0:
+                print('Number of extract data: ', counter)
+                time.sleep(60)
+            counter += 1
+            
+        except Exception as e:
+            print(f"An error occurred with URL {address}: {e}")
+            continue
+        
+    batch_counter += 1
+    data_dict = {'urls':urls, 'titles':titles, 'keywords':keywords,
+                'tldrs':tldrs, 'abstracts':abstracts, 'one_sentence_summ':one_sentence_summ}
+    
+    df_iclr = pd.DataFrame(data_dict)
+    df_iclr.to_csv(f"iclr_2024/df_iclr_2024_{urls_list.index(df_iclr.iloc[0]['urls'])}_{urls_list.index(df_iclr.iloc[-1]['urls'])}.csv",
+                   index=False, encoding='utf-8')
+    
+    print('Number of batch: ', batch_counter)
