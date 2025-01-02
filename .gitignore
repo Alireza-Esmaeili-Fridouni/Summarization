@@ -1,7 +1,8 @@
+
 chromedriver.exe
 chromedriver-win64
 .venv_scraping
-chatgpt_suggest_website.txt
-test.py
-openreview_scraping.py
-batch_test.py
+trash/
+data_collector/*.exe
+data_collector/chromedriver-win64/
+.ipynb_checkpoints/
