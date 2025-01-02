@@ -7,7 +7,7 @@ import os
 def combine_csv(name_folder: str):
     # names_datasets = list(map(os.path.basename, glob.glob(f'{name_folder}/df_*.csv')))
 
-    names_datasets = glob.glob(f'{name_folder}/df_*.csv')
+    names_datasets = glob.glob(f'{name_folder}/*.csv')
     names_datasets = sorted(names_datasets,
                             key=lambda x: [int(num) for num in re.findall(r'\d+', os.path.basename(x))]
                             )
@@ -25,6 +25,13 @@ def combine_csv(name_folder: str):
     return df
 
 
-iclr_20212 = combine_csv('iclr_from_2017_to_2020')
-iclr_20212.to_csv('test_2021.csv', index=False)
 
+name_folders = [name for name in os.listdir('.') if os.path.isdir(os.path.join('.', name)) and name.startswith('iclr')]
+
+for name in name_folders:
+    df = combine_csv(name)
+    df.to_csv(f'collection_data/{name}.csv', index=False)
+
+
+collection_dataset = combine_csv('collection_data')
+collection_dataset.to_csv('collection_data/collection_dataset.csv', index=False)
