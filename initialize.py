@@ -16,8 +16,6 @@ def load_model(model_name:str):
     
     tokenizer = AutoTokenizer.from_pretrained(
         model_name,
-        lowercase = True,
-        verbose = False,
         return_tensors = "pt")
     
     return model, tokenizer
