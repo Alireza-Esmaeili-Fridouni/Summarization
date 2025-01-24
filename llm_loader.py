@@ -88,17 +88,17 @@ class LLMLoader:
         return qlora_model, tokenizer
     
     
-    class Loader:
-    
-        model_loader = {
-                "simple": "load_simple_model",
-                "pipeline": "load_pipeline_model",
-                "qlora": "load_qlora_model",
-                "quantized":"load_quantized_model" 
-            }
-        def __new__(self, model_name:str, token:str="", load_type:str=""):
-            loader = "LLMLoader(model_name=model_name, token=token)." + self.model_loader.get(load_type, "simple") + "()"
-            return eval(loader)
+class Loader:
+
+    model_loader = {
+            "simple": "load_simple_model",
+            "pipeline": "load_pipeline_model",
+            "qlora": "load_qlora_model",
+            "quantized":"load_quantized_model" 
+        }
+    def __new__(self, model_name:str, token:str="", load_type:str=""):
+        loader = "LLMLoader(model_name=model_name, token=token)." + self.model_loader.get(load_type, "simple") + "()"
+        return eval(loader)
         
 # loader = LLMLoader(model_name="llama") 
 # model, tokenizer = loader.load_simple_model()
