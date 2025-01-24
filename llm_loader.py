@@ -12,7 +12,7 @@ class LLMLoader:
             login(token)
     
     # load model with tokenizer
-    def load_model(self):       
+    def load_simple_model(self):       
         model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
                 device_map = "balanced"
@@ -27,7 +27,29 @@ class LLMLoader:
                 model = self.model_name,
                 device_map="balanced"
             )
-        return pipeline_model
+        return pipeline_model, None
+    
+    # load quantizing
+    def load_quantized_model(self): 
+        #load tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        
+        # Quantization configuration for efficient memory usage
+        quant_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_use_double_quant=False,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=torch.bfloat16
+            )
+        
+        # Load the base model in 4-bit precision
+        model = AutoModelForCausalLM.from_pretrained(
+                self.model_name,
+                quantization_config=quant_config,
+                device_map="balanced"
+            )
+        
+        return model, tokenizer
 
 
     # Qlora model
@@ -64,3 +86,19 @@ class LLMLoader:
         qlora_model = get_peft_model(model, lora_config)
         
         return qlora_model, tokenizer
+    
+    
+    class Loader:
+    
+        model_loader = {
+                "simple": "load_simple_model",
+                "pipeline": "load_pipeline_model",
+                "qlora": "load_qlora_model",
+                "quantized":"load_quantized_model" 
+            }
+        def __new__(self, model_name:str, token:str="", load_type:str=""):
+            loader = "LLMLoader(model_name=model_name, token=token)." + self.model_loader.get(load_type, "simple") + "()"
+            return eval(loader)
+        
+# loader = LLMLoader(model_name="llama") 
+# model, tokenizer = loader.load_simple_model()
