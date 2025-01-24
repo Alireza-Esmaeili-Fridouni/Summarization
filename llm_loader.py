@@ -72,4 +72,4 @@ class LLMLoader:
         # Add LoRA layers to the base model
         qlora_model = get_peft_model(model, lora_config)
         
-        return tokenizer, qlora_model
+        return qlora_model, tokenizer
