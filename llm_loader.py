@@ -4,17 +4,16 @@ from huggingface_hub import login
 import torch
 
 
-class ModelLoader:
+class LLMLoader:
     
     def __init__(self, model_name:str, token:str=""):
         self.model_name = model_name
         self.token = token
+        if 'llama' in self.model_name.lower():
+            login(token)
     
     # load model with tokenizer
     def load_model(self):
-        
-        if 'llama' in self.model_name.lower():
-            login(self.token)
         
         model = AutoModelForCausalLM.from_pretrained(
             self.model_name,
@@ -30,9 +29,6 @@ class ModelLoader:
 
     # load pipeline model
     def load_pipeline_model(self):
-        
-        if 'llama' in self.model_name.lower():
-            login(self.token)
             
         pipeline_model = pipeline(
             "text-generation",
@@ -45,10 +41,7 @@ class ModelLoader:
 
     # Qlora model
     def load_qlora_model(self):
-        
-        if 'llama' in self.model_name.lower():
-            login(self.token)
-        
+          
         #load tokenizer
         tokenizer = AutoTokenizer.from_pretrained(
             self.model_name,
