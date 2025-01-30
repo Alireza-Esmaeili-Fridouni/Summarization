@@ -22,3 +22,11 @@ def save_dataframe(df, directory, filename):
         print("Error: Permission denied. Try saving to a different location.")
     except Exception as e:
         print(f"Error: {e}")
+        
+def prompt_filler(prompt_template, instruction, title, abstract):
+    prompt = prompt_template.format(title=title, abstract=abstract)
+    message = [
+        {"role": "system", "content": instruction},
+        {"role": "user", "content": prompt}
+    ]
+    return message
