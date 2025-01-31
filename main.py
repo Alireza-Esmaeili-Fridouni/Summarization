@@ -23,3 +23,8 @@ class SummaryDataset(Dataset):
                                      abstract=abstract
                                      )
         return message
+    
+    
+def get_dataloader(path:str, csv_file_name:str, shuffle=True, batch_size=2):
+    dataset = SummaryDataset(path, csv_file_name)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
