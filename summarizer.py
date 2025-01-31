@@ -12,8 +12,7 @@ class SummarizerLLM:
                 tokenize=False,
                 add_generation_prompt=True
             )
-        encoded_data = self.tokenizer([text], return_tensors="pt")
-        encoded_data = {key: tensor.to(self.model.device) for key, tensor in encoded_data.items()}
+        encoded_data = self.tokenizer([text], return_tensors="pt").to(self.model.device)
         generated_ids = self.model.generate(
                 **encoded_data,
                 max_new_tokens=512
@@ -26,4 +25,8 @@ class SummarizerLLM:
         return decoded_data
     
     def summarize_batch(self, input_texts):
-        pass
+        summaries = []
+        for text in input_texts:
+            summary = self.summarize(input_text=text)
+            summaries.append(summary)
+        return summaries
