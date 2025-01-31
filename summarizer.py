@@ -7,8 +7,23 @@ class SummarizerLLM:
         self.model, self.tokenizer = Loader(model_name=model_name, load_type=load_type)
         
     def summarize(self, input_text):
-        # ...
-        pass
+        text = self.tokenizer.apply_chat_template(
+                input_text,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+        encoded_data = self.tokenizer([text], return_tensors="pt")
+        encoded_data = {key: tensor.to(self.model.device) for key, tensor in encoded_data.items()}
+        generated_ids = self.model.generate(
+                **encoded_data,
+                max_new_tokens=512
+            )
+        generated_ids = [
+                output_ids[len(input_ids):] 
+                for input_ids, output_ids in zip(encoded_data["input_ids"], generated_ids)
+            ]
+        decoded_data = self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        return decoded_data
     
     def summarize_batch(self, input_texts):
         pass
