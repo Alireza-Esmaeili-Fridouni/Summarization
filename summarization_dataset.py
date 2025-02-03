@@ -5,10 +5,10 @@ import util
 import config
 
 class SummaryDataset(Dataset):
-    def __init__(self, path:str, csv_file_name:str):
+    def __init__(self, path:str, tokenizer):
         super().__init__()
-        self.path = path
-        self.data = pd.read_csv(os.path.join(self.path, csv_file_name))
+        self.data = pd.read_csv(path)
+        self.tokenizer = tokenizer
         
     
     def __len__(self):
@@ -17,14 +17,20 @@ class SummaryDataset(Dataset):
     def __getitem__(self, index):
         title = self.data.iloc[index]['titles']
         abstract = self.data.iloc[index]['abstracts'] 
+        summary = self.data.iloc[index]['one_sentence_summary']
         message = util.prompt_filler(prompt_template=config.standard_prompt,
                                      instruction=config.instruction,
                                      title=title,
                                      abstract=abstract
                                      )
-        return message
+        text = self.tokenizer.apply_chat_template(
+                message,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+        return text, summary 
     
     
-def get_dataloader(path:str, csv_file_name:str, shuffle=True, batch_size=2):
-    dataset = SummaryDataset(path, csv_file_name)
+def get_dataloader(path:str, tokenizer, shuffle=True, batch_size=2):
+    dataset = SummaryDataset(path, tokenizer)
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
