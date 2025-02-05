@@ -1,5 +1,4 @@
 from torch.utils.data import Dataset, DataLoader
-import pandas as pd
 import os
 import util
 import config
@@ -7,7 +6,7 @@ import config
 class SummaryDataset(Dataset):
     def __init__(self, path:str, tokenizer):
         super().__init__()
-        self.data = pd.read_csv(path)
+        self.data = util.read_csv(path)
         self.tokenizer = tokenizer
         
     
