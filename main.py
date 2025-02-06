@@ -26,17 +26,16 @@ class SummarizationPipeline:
         #         result.append({"Ground_truth":gt, "Generated Summary":generated})
         # return result
         
-    def run(self, input_path, output_path):
+    def run(self, input_path):
         if not os.path.exists(input_path):
             print(f"Input path {input_path} does not exist")
             return
         data_loader = get_dataloader(input_path, self.tokenizer, shuffle=False, batch_size=self.batch_size)
         results = self.batch_processing(data_loader)
         df = pd.DataFrame(results)
-        util.save_dataframe
+        return df
     
 input_path = ""
-output_path = ""
     
 if __name__ == "__main__":
     pipeline = SummarizationPipeline(model_name=config.model_name,
@@ -44,4 +43,4 @@ if __name__ == "__main__":
                                      batch_size=2,
                                      token=config.token
                                     )
-    pipeline.run(input_path=input_path, output_path=output_path)
+    pipeline.run(input_path=input_path)
