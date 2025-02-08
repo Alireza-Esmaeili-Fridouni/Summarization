@@ -4,10 +4,11 @@ import util
 import config
 
 class SummaryDataset(Dataset):
-    def __init__(self, path:str, tokenizer):
+    def __init__(self, path:str, tokenizer, prompt):
         super().__init__()
         self.data = util.read_csv(path)
         self.tokenizer = tokenizer
+        self.prompt = prompt
         
     
     def __len__(self):
@@ -17,7 +18,7 @@ class SummaryDataset(Dataset):
         title = self.data.iloc[index]['titles']
         abstract = self.data.iloc[index]['abstracts'] 
         summary = self.data.iloc[index]['one_sentence_summary']
-        message = util.prompt_filler(prompt_template=config.standard_prompt,
+        message = util.prompt_filler(prompt_template=self.prompt,
                                      instruction=config.instruction,
                                      title=title,
                                      abstract=abstract
