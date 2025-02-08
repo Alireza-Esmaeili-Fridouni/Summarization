@@ -8,16 +8,16 @@ class LLMLoader:
     
     def __init__(self, model_name:str, token:str=""):
         self.model_name = model_name
-        if 'llama' in self.model_name.lower():
-            login(token)
+        self.token = token
     
     # load model with tokenizer
     def load_simple_model(self):       
         model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
+                token = self.token,
                 device_map = "balanced"
             )      
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name, token=self.token)
         return model, tokenizer
 
     # load pipeline model
@@ -25,6 +25,7 @@ class LLMLoader:
         pipeline_model = pipeline(
                 "text-generation",
                 model = self.model_name,
+                token=self.token,
                 device_map="balanced"
             )
         return pipeline_model, None
@@ -32,7 +33,7 @@ class LLMLoader:
     # load quantizing
     def load_quantized_model(self): 
         #load tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_nam, token=self.token)
         
         # Quantization configuration for efficient memory usage
         quant_config = BitsAndBytesConfig(
@@ -45,6 +46,7 @@ class LLMLoader:
         # Load the base model in 4-bit precision
         model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
+                token=self.token,
                 quantization_config=quant_config,
                 device_map="balanced"
             )
@@ -55,7 +57,7 @@ class LLMLoader:
     # Qlora model
     def load_qlora_model(self): 
         #load tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name, token=self.token)
         
         # Quantization configuration for efficient memory usage
         quant_config = BitsAndBytesConfig(
@@ -68,6 +70,7 @@ class LLMLoader:
         # Load the base model in 4-bit precision
         model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
+                token=self.token,
                 quantization_config=quant_config,
                 device_map="balanced"
             )
