@@ -31,6 +31,6 @@ class SummaryDataset(Dataset):
         return text, summary 
     
     
-def get_dataloader(path:str, tokenizer, shuffle=True, batch_size=2):
-    dataset = SummaryDataset(path, tokenizer)
+def get_dataloader(path:str, tokenizer, prompt, shuffle=True, batch_size=2):
+    dataset = SummaryDataset(path, tokenizer, prompt)
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
