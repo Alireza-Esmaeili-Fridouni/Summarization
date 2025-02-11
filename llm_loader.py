@@ -100,7 +100,7 @@ class Loader:
             "quantized":"load_quantized_model" 
         }
     def __new__(cls, model_name:str, token:str="", load_type:str=""):
-        loader = "LLMLoader(model_name=model_name, token=token)." + Loader.model_loader.get(load_type, "simple") + "()"
+        loader = "LLMLoader(model_name=model_name, token=token)." + Loader.model_loader.get(load_type, "load_simple_model") + "()"
         return eval(loader)
         
 # loader = LLMLoader(model_name="llama") 
