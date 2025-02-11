@@ -1,4 +1,5 @@
-from summarization_dataset import SummaryDataset, get_dataloader
+from summarization_dataset import BaseAbstractDataset, get_dataloader
+from summarization_dataset import AdvancedAbstractDataset
 from summarizer import SummarizerLLM
 import config
 import pandas as pd
@@ -26,11 +27,17 @@ class SummarizationPipeline:
         #         result.append({"Ground_truth":gt, "Generated Summary":generated})
         # return result
         
-    def run(self, input_path, prompt):
+    def run(self, dataset_class, input_path, prompt):
         if not os.path.exists(input_path):
             print(f"Input path {input_path} does not exist")
             return
-        data_loader = get_dataloader(input_path, self.tokenizer, prompt, shuffle=False, batch_size=self.batch_size, )
+        data_loader = get_dataloader(dataset_class=dataset_class,
+                                     path=input_path,
+                                     tokenizer=self.tokenizer,
+                                     prompt=prompt,
+                                     shuffle=False,
+                                     batch_size=self.batch_size
+                                    )
         results = self.batch_processing(data_loader)
         df = pd.DataFrame(results)
         return df
