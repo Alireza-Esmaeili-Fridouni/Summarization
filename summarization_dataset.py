@@ -4,9 +4,9 @@ import util
 import config
 
 class BaseAbstractDataset(Dataset):
-    def __init__(self, path:str, tokenizer, prompt):
+    def __init__(self, dataset_name:str, tokenizer, prompt):
         super().__init__()
-        self.data = util.read_csv(path)
+        self.data = util.read_csv(dataset_name)
         self.tokenizer = tokenizer
         self.prompt = prompt
         
