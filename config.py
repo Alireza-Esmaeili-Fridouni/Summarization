@@ -28,7 +28,7 @@ more than 30 words. Follow these instructions:
 - Do not include unnecessary details or additional information or exceed the specified word count of 30 words.
 Title: {title}
 Abstract: {abstract}
-This short summary must accurately and completely include the provided keywords.
+To generate the one sentence summary, you are allowed to use the keywords that have been provided to you.
 Keywords: {keywords}
 One sentence summary:'''
 
