@@ -1,12 +1,12 @@
 import pandas as pd
 import os
 
-def read_csv(file_path):
-    if not os.path.exists(file_path):
+def read_csv(dataset_name:str):
+    if not os.path.exists(dataset_name):
         print("Error: File not found.")
         return None
     try:
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(dataset_name)
         return df
     except Exception as e:
         print(f"Error: {e}")
@@ -23,8 +23,16 @@ def save_dataframe(df, directory, filename):
     except Exception as e:
         print(f"Error: {e}")
         
-def prompt_filler(prompt_template, instruction, title, abstract):
+def base_prompt_filler(prompt_template, instruction, title, abstract):
     prompt = prompt_template.format(title=title, abstract=abstract)
+    message = [
+        {"role": "system", "content": instruction},
+        {"role": "user", "content": prompt}
+    ]
+    return message
+
+def advanced_prompt_filler(prompt_template, instruction, title, abstract, keywords):
+    prompt = prompt_template.format(title=title, abstract=abstract, keywords=keywords)
     message = [
         {"role": "system", "content": instruction},
         {"role": "user", "content": prompt}
