@@ -18,7 +18,7 @@ class SummarizationPipeline:
         for batch in data_loader:
             input_texts, _ = batch
             summaries_batch = self.summarizer.summarize_batch(input_texts=input_texts)
-            summaries = result.extend(summaries)
+            summaries = result.extend(summaries_batch)
         return summaries 
         # for batch in data_loader:
         #     input_texts, grand_truth = batch
