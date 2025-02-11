@@ -51,6 +51,6 @@ class AdvancedAbstractDataset(BaseAbstractDataset):
         
     
     
-def get_dataloader(dataset_class, path:str, tokenizer, prompt, shuffle=True, batch_size=2):
-    dataset = dataset_class(path, tokenizer, prompt)
+def get_dataloader(dataset_class, dataset_name:str, tokenizer, prompt, shuffle=True, batch_size=2):
+    dataset = dataset_class(dataset_name, tokenizer, prompt)
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
