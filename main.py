@@ -27,12 +27,12 @@ class SummarizationPipeline:
         #         result.append({"Ground_truth":gt, "Generated Summary":generated})
         # return result
         
-    def run(self, dataset_class, input_path, prompt):
-        if not os.path.exists(input_path):
-            print(f"Input path {input_path} does not exist")
+    def run(self, dataset_class, dataset_name, prompt):
+        if not os.path.exists(dataset_name):
+            print(f"File {dataset_name} does not exist")
             return
         data_loader = get_dataloader(dataset_class=dataset_class,
-                                     path=input_path,
+                                     dataset_name=dataset_name,
                                      tokenizer=self.tokenizer,
                                      prompt=prompt,
                                      shuffle=False,
@@ -42,8 +42,9 @@ class SummarizationPipeline:
         df = pd.DataFrame(results)
         return df
     
-input_path = ""
+dataset_name = ""
 prompt = ""
+dataset_class = ""
     
 if __name__ == "__main__":
     pipeline = SummarizationPipeline(model_name=config.model_name,
@@ -51,4 +52,7 @@ if __name__ == "__main__":
                                      batch_size=2,
                                      token=config.token
                                     )
-    pipeline.run(input_path=input_path, prompt=prompt)
+    pipeline.run(dataset_class=dataset_class,
+                 dataset_name=dataset_name,
+                 prompt=prompt
+                )
