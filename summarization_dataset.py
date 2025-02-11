@@ -3,7 +3,7 @@ import os
 import util
 import config
 
-class SummaryDataset(Dataset):
+class BaseAbstractDataset(Dataset):
     def __init__(self, path:str, tokenizer, prompt):
         super().__init__()
         self.data = util.read_csv(path)
@@ -18,7 +18,7 @@ class SummaryDataset(Dataset):
         title = self.data.iloc[index]['titles']
         abstract = self.data.iloc[index]['abstracts'] 
         summary = self.data.iloc[index]['one_sentence_summary']
-        message = util.prompt_filler(prompt_template=self.prompt,
+        message = util.base_prompt_filler(prompt_template=self.prompt,
                                      instruction=config.instruction,
                                      title=title,
                                      abstract=abstract
@@ -30,7 +30,27 @@ class SummaryDataset(Dataset):
             )
         return text, summary 
     
+class AdvancedAbstractDataset(BaseAbstractDataset):
+    def __getitem__(self, index):
+        title = self.data.iloc[index]['titles']
+        abstract = self.data.iloc[index]['abstracts']
+        keywords = self.data.iloc[index]['keywords'] 
+        summary = self.data.iloc[index]['one_sentence_summary']
+        message = util.advanced_prompt_filler(prompt_template=self.prompt,
+                                     instruction=config.instruction,
+                                     title=title,
+                                     abstract=abstract,
+                                     keywords=keywords
+                                     )
+        text = self.tokenizer.apply_chat_template(
+                message,
+                tokenize=False,
+                add_generation_prompt=True
+            )
+        return text, summary
+        
     
-def get_dataloader(path:str, tokenizer, prompt, shuffle=True, batch_size=2):
-    dataset = SummaryDataset(path, tokenizer, prompt)
+    
+def get_dataloader(dataset_class, path:str, tokenizer, prompt, shuffle=True, batch_size=2):
+    dataset = dataset_class(path, tokenizer, prompt)
     return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
