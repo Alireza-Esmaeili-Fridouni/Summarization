@@ -33,7 +33,7 @@ class LLMLoader:
     # load quantizing
     def load_quantized_model(self): 
         #load tokenizer
-        tokenizer = AutoTokenizer.from_pretrained(self.model_nam, token=self.token)
+        tokenizer = AutoTokenizer.from_pretrained(self.model_name, token=self.token)
         
         # Quantization configuration for efficient memory usage
         quant_config = BitsAndBytesConfig(
