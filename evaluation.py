@@ -50,7 +50,7 @@ class Evaluation_df(Evaluation):
     return self.df
 
   def BERT_Score(self, model_name:str, ground_truth_col_name:str):
-    self.df[self.new_col_name] = self.df.apply(
+    self.df[f"Precision, Recall, F1{self.new_col_name}"] = self.df.apply(
         lambda x: ", ".join(map(str, Evaluation(x[self.generated_col_name]).BERT_Score(model_name, x[ground_truth_col_name]))),
         axis=1
     )
