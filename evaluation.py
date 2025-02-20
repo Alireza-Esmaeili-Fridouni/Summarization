@@ -44,13 +44,13 @@ class Evaluation_df(Evaluation):
     return self.df
 
   def BLEU_ROUGE_Score(self, ground_truth_col_name:str, mode="bleu"):
-    self.df[self.new_col_name] = self.df.apply(
+    self.df[f"{self.new_col_name} evaluate with {mode}"] = self.df.apply(
                                   lambda x:Evaluation(x[self.generated_col_name]).BLEU_ROUGE_Score(x[ground_truth_col_name], mode=mode), axis=1
                                   )
     return self.df
 
   def BERT_Score(self, model_name:str, ground_truth_col_name:str):
-    self.df[f"Precision, Recall, F1{self.new_col_name}"] = self.df.apply(
+    self.df[f"{self.new_col_name}(Precision, Recall, F1)"] = self.df.apply(
         lambda x: ", ".join(map(str, Evaluation(x[self.generated_col_name]).BERT_Score(model_name, x[ground_truth_col_name]))),
         axis=1
     )
