@@ -67,13 +67,13 @@ class Evaluation_df(Evaluator):
     )
     return self.df
 
-def EVALUATION(df:pd.DataFrame, model_name:str):
+def EVALUATION(df:pd.DataFrame, bert_model_name:str):
   evaluation = Evaluation_df(df=df, new_col_name="Evaluation", generated_col_name="generated-summary")
   df = evaluation.get_word_count()
   df = evaluation.get_sentence_count()
   df = evaluation.BLEU_Score(ground_truth_col_name="one_sentence_summary")
   df = evaluation.ROUGE_Score(ground_truth_col_name="one_sentence_summary")
-  df = evaluation.BERT_Score(model_name=model_name, ground_truth_col_name="one_sentence_summary")
+  df = evaluation.BERT_Score(model_name=bert_model_name, ground_truth_col_name="one_sentence_summary")
   return df
 
   
