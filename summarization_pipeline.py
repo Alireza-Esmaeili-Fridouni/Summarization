@@ -31,5 +31,5 @@ class SummarizationPipeline:
                                      batch_size=self.batch_size
                                     )
         results = self.batch_processing(data_loader)
-        dataset['generated-summary'] = results
-        return dataset
+        # dataset['generated-summary'] = results
+        return results
