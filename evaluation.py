@@ -34,41 +34,45 @@ class Evaluation(Evaluator):
   def __init__(self):
     self.evaluator = Evaluator()
 
-  def word_count_eval(self, df, generated_col_name:str, generated_summary_col_name:str):
-    df[f"{generated_col_name} (words_count)"] = df[generated_summary_col_name].apply(lambda x:self.evaluator.get_word_count(x))
+  def word_count_eval(self, df, generated_col_name:str):
+    df[f"{generated_col_name}_words_count"] = df[generated_col_name].apply(lambda x:self.evaluator.get_word_count(x))
     return df
 
-  def sentence_count_eval(self, df, generated_col_name:str, generated_summary_col_name:str): 
-    df[f"{generated_col_name} (sentences_count)"] = df[generated_summary_col_name].apply(
+  def sentence_count_eval(self, df, generated_col_name:str): 
+    df[f"{generated_col_name}_sentences_count"] = df[generated_col_name].apply(
                                   lambda x:self.evaluator.get_sentence_count(x)
                                   )
     return df
 
-  def bleu_score_eval(self, df, generated_col_name:str, generated_summary_col_name:str, ground_truth_col_name:str):
-    df[f"{generated_col_name} (bleu)"] = df.apply(
-                                  lambda x:self.evaluator.bleu_score(ground_truth=x[ground_truth_col_name], generated_summary=x[generated_summary_col_name]), 
+  def bleu_score_eval(self, df, generated_col_name:str, ground_truth_col_name:str):
+    df[f"{generated_col_name}_bleu"] = df.apply(
+                                  lambda x:self.evaluator.bleu_score(ground_truth=x[ground_truth_col_name], generated_summary=x[generated_col_name]), 
                                   axis=1
                                   )
     return df
   
-  def rouge_score_eval(self, df, generated_col_name:str, generated_summary_col_name:str, ground_truth_col_name:str):
-    df[f"{generated_col_name} (rouge1, rougeL)"] = df.apply(
-                                  lambda x:", ".join(map(str, self.evaluator.rouge_score(ground_truth=x[ground_truth_col_name], generated_summary=x[generated_summary_col_name]))), 
+  def rouge_score_eval(self, df, generated_col_name:str, ground_truth_col_name:str):
+    df[[f"{generated_col_name}_rouge1", f"{generated_col_name}_rougeL"]] = df.apply(
+                                  lambda x:pd.Series(self.evaluator.rouge_score(
+                                    ground_truth=x[ground_truth_col_name], generated_summary=x[generated_col_name]
+                                  )), 
                                   axis=1
                                   )
     return df
 
-  def bert_score_eval(self, df, generated_col_name:str, generated_summary_col_name:str, ground_truth_col_name:str):
-    df[f"{generated_col_name} (bert_score)(p,r,f1)"] = df.apply(
-        lambda x: ", ".join(map(str, self.evaluator.bert_score(ground_truth=x[ground_truth_col_name], generated_summary=x[generated_summary_col_name]))),
+  def bert_score_eval(self, df, generated_col_name:str, ground_truth_col_name:str):
+    df[[f"{generated_col_name}_bert_score_precision", 
+        f"{generated_col_name}_bert_score_recall", 
+        f"{generated_col_name}_bert_score_f1"]] = df.apply(
+        lambda x: pd.Series(self.evaluator.bert_score(ground_truth=x[ground_truth_col_name], generated_summary=x[generated_col_name])),
         axis=1
     )
     return df
 
   def evaluate_summary(self, df:pd.DataFrame, prompt_name:str):
-    df = self.word_count_eval(df=df, generated_col_name=prompt_name, generated_summary_col_name=prompt_name)
-    df = self.sentence_count_eval(df=df, generated_col_name=prompt_name, generated_summary_col_name=prompt_name)
-    df = self.bleu_score_eval(df=df, generated_col_name=prompt_name, generated_summary_col_name=prompt_name, ground_truth_col_name="one_sentence_summary")
-    df = self.rouge_score_eval(df=df, generated_col_name=prompt_name, generated_summary_col_name=prompt_name, ground_truth_col_name="one_sentence_summary")
-    df = self.bert_score_eval(df=df, generated_col_name=prompt_name, generated_summary_col_name=prompt_name, ground_truth_col_name="one_sentence_summary")
+    df = self.word_count_eval(df=df, generated_col_name=prompt_name)
+    df = self.sentence_count_eval(df=df, generated_col_name=prompt_name)
+    df = self.bleu_score_eval(df=df, generated_col_name=prompt_name, ground_truth_col_name="one_sentence_summary")
+    df = self.rouge_score_eval(df=df, generated_col_name=prompt_name, ground_truth_col_name="one_sentence_summary")
+    df = self.bert_score_eval(df=df, generated_col_name=prompt_name, ground_truth_col_name="one_sentence_summary")
     return df
