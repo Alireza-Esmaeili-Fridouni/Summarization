@@ -56,7 +56,6 @@ model_name_list = ["Qwen/Qwen2.5-1.5B-Instruct",
 huggingface_token = os.environ['HUGGINGFACE_ACCESS_TOKEN']
 openai_token = os.environ['OPENAI_KEY']
 loader_type = "quantized"
-model_name = "meta-llama/Llama-3.2-1B-Instruct"
-test_path = ""
-train_path = ""
+test_df = ""
+train_df = ""
 
