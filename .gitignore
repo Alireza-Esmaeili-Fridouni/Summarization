@@ -6,4 +6,3 @@ trash/
 data_collector/*.exe
 data_collector/chromedriver-win64/
 .ipynb_checkpoints/
-.env
