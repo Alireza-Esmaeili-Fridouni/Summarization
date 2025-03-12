@@ -18,14 +18,20 @@ class Evaluator:
     return sentence_count
   
   def bleu_score(self, ground_truth:str, generated_summary):
+    if not generated_summary:
+      return 0.0
     score = self.bleu.compute(predictions=[str(generated_summary)], references=[str(ground_truth)])
     return score['bleu']
   
   def rouge_score(self, ground_truth:str, generated_summary):
+    if not generated_summary:
+      return 0.0, 0.0
     score = self.rouge.compute(predictions=[str(generated_summary)], references=[str(ground_truth)])
     return round(score['rouge1'], 3), round(score['rougeL'], 3)
   
   def bert_score(self, ground_truth:str, generated_summary):
+    if not generated_summary:
+      return 0.0, 0.0, 0.0
     precision, recall, f1 = self.bert_scorer.score(cands=[generated_summary], refs=[ground_truth])
     return round(precision.item(), 3), round(recall.item(), 3), round(f1.item(), 3)
   

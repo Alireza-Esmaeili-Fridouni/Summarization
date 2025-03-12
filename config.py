@@ -50,12 +50,14 @@ model_name_list = ["Qwen/Qwen2.5-1.5B-Instruct",
                    "tiiuae/Falcon3-1B-Instruct",
                    "tiiuae/falcon-mamba-7b-instruct",
                    "tiiuae/Falcon3-7B-Instruct",
-                   "ministral/Ministral-3b-instruct"
+	        "deepseek-ai/deepseek-moe-16b-base"
                   ]
 
 huggingface_token = os.environ['HUGGINGFACE_ACCESS_TOKEN']
 openai_token = os.environ['OPENAI_KEY']
 loader_type = "quantized"
-test_df = ""
-train_df = ""
+test_df = "dataset/test_data.csv"
+train_df = "dataset/train_data.csv"
+
+
 

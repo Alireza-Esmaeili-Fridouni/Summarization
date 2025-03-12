@@ -34,6 +34,7 @@ class LLMLoader:
     def load_quantized_model(self): 
         #load tokenizer
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, token=self.token)
+        tokenizer.pad_token = tokenizer.eos_token
         
         # Quantization configuration for efficient memory usage
         quant_config = BitsAndBytesConfig(
@@ -58,6 +59,7 @@ class LLMLoader:
     def load_qlora_model(self): 
         #load tokenizer
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, token=self.token)
+        tokenizer.pad_token = tokenizer.eos_token
         
         # Quantization configuration for efficient memory usage
         quant_config = BitsAndBytesConfig(
@@ -67,20 +69,38 @@ class LLMLoader:
                 bnb_4bit_compute_dtype=torch.bfloat16
             )
         
+
         # Load the base model in 4-bit precision
-        model = AutoModelForCausalLM.from_pretrained(
-                self.model_name,
-                token=self.token,
-                quantization_config=quant_config,
-                device_map="balanced"
-            )
+        if "Phi" in self.model_name:
+            model = AutoModelForCausalLM.from_pretrained(
+                    self.model_name,
+                    token=self.token,
+                    quantization_config=quant_config,
+                    _attn_implementation="eager",
+                    trust_remote_code=True,
+                    device_map="balanced"
+                )
+        else:
+            model = AutoModelForCausalLM.from_pretrained(
+                    self.model_name,
+                    token=self.token,
+                    quantization_config=quant_config,
+                    device_map="balanced"
+                )
         
         # Define LoRA configuration
+        if "Phi" in self.model_name:
+            target_modules =['o_proj', 'qkv_proj']
+        elif "Falcon3-Mamba" in self.model_name:
+            target_modules =['in_proj', 'dt_proj']
+        else:
+            target_modules=  ["q_proj", "v_proj"]
+
         lora_config = LoraConfig(
                 task_type=TaskType.CAUSAL_LM,  
                 r=16,  
                 lora_alpha=32,  
-                target_modules=["q_proj", "v_proj"],  
+                target_modules=   target_modules,  
                 lora_dropout=0.1,  
                 bias="none"  
             )
