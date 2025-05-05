@@ -9,8 +9,8 @@ if __name__ == "__main__":
     
     evaluate = ev.Evaluation()
     for model_name in model_name_list:
+        dataset = read_csv(train_df)
         for prompt_name, prompt in prompt_list.items():
-            dataset = read_csv(train_df)
             pipeline = SummarizationPipeline(model_name=model_name,
                                             load_type="qlora",
                                             batch_size=2,
@@ -26,5 +26,5 @@ if __name__ == "__main__":
                             prompt=prompt)
             dataset[prompt_name] = output
             dataset = evaluate.evaluate_summary(df=dataset, prompt_name=prompt_name)
-            file_name = f"{model_name}-{prompt_name}-evaluation.csv"
-            save_dataframe(df=dataset, directory="", filename=file_name)
+        file_name = f"{model_name}-evaluation.csv"
+        save_dataframe(df=dataset, directory="", filename=file_name)
