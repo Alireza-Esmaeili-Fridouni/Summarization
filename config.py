@@ -50,8 +50,10 @@ model_name_list = ["Qwen/Qwen2.5-1.5B-Instruct",
                    "tiiuae/Falcon3-1B-Instruct",
                    "tiiuae/falcon-mamba-7b-instruct",
                    "tiiuae/Falcon3-7B-Instruct",
-	                 "deepseek-ai/deepseek-moe-16b-base",
-                   "Qwen/Qwen2.5-0.5B-Instruct"
+	                 "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+                   "Qwen/Qwen2.5-0.5B-Instruct",
+                   "google/gemma-3-1b-it",
+                   "google/gemma-3-4b-it"
                   ]
 
 huggingface_token = os.environ['HUGGINGFACE_ACCESS_TOKEN']
