@@ -1,6 +1,6 @@
 from summarization_dataset import get_dataloader
 from summarizer import SummarizerLLM
-
+from tqdm import tqdm
 
 class SummarizationPipeline:
     def __init__(self, model_name:str, load_type="qlora", batch_size=2, token=""):
@@ -10,7 +10,7 @@ class SummarizationPipeline:
         
     def batch_processing(self, data_loader):
         result = list()
-        for batch in data_loader:
+        for batch in tqdm(data_loader):
             input_texts, _ = batch
             summaries_batch = self.summarizer.summarize_batch(input_texts=input_texts)
             result.extend(summaries_batch)
