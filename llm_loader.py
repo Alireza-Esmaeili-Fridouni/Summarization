@@ -71,7 +71,7 @@ class LLMLoader:
         
 
         # Load the base model in 4-bit precision
-        if "Phi" in self.model_name:
+        if "Phi" in self.model_name or "gemma" in self.model_name:
             model = AutoModelForCausalLM.from_pretrained(
                     self.model_name,
                     token=self.token,
