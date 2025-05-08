@@ -1,23 +1,16 @@
 from llm_loader import Loader
 import util
-import re
 
 class SummarizerLLM:
     
     def __init__(self, model_name, load_type='qlora', token=""):
-        self.model_name = model_name
         self.model, self.tokenizer = Loader(model_name=model_name, load_type=load_type, token=token)
-        if 'Qwen2.5' in re.split(r'[/\-]', self.model_name):
-            self.tokenizer.padding_side = 'left'
         
     def get_model_and_tokenizer(self):
         return self.model, self.tokenizer
         
     def summarize(self, input_text):
-        if 'gemma' in re.split(r'[/\-]', self.model_name): 
-            encoded_data = self.tokenizer(input_text, return_tensors="pt", max_length=2048).to(self.model.device)
-        else:
-            encoded_data = self.tokenizer(input_text, return_tensors="pt").to(self.model.device)
+        encoded_data = self.tokenizer(input_text, return_tensors="pt").to(self.model.device)
         generated_ids = self.model.generate(
                 **encoded_data,
                 max_new_tokens=512
@@ -40,23 +33,12 @@ class SummarizerLLM:
             list of str: Summarized texts for each input.
         """
         # Tokenize the batch of input texts
-        if 'gemma' in re.split(r'[/\-]', self.model_name):
-            # Tokenize the batch of input texts
-            encoded_data = self.tokenizer(
-                input_texts, 
-                return_tensors="pt", 
-                padding=True,  # Ensures uniform tensor sizes
-                truncation=True,  # Avoids excessively long inputs
-                max_length=2048
-            ).to(self.model.device)
-        else:
-            # Tokenize the batch of input texts
-            encoded_data = self.tokenizer(
-                input_texts, 
-                return_tensors="pt", 
-                padding=True,  # Ensures uniform tensor sizes
-                truncation=True  # Avoids excessively long inputs
-            ).to(self.model.device)
+        encoded_data = self.tokenizer(
+            input_texts, 
+            return_tensors="pt", 
+            padding=True,  # Ensures uniform tensor sizes
+            truncation=True,  # Avoids excessively long inputs
+        ).to(self.model.device)
 
         # Generate summaries for all inputs in the batch
         generated_ids = self.model.generate(
